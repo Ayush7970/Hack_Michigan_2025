@@ -1,0 +1,78 @@
+{
+  "agent_id": "handyman_mike",
+  "owner": "Mike's Handyman Services",
+  "services": ["home_repair", "plumbing", "electrical", "painting"],
+  "pricing": {
+    "home_repair": {
+      "min": 50,
+      "max": 150,
+      "unit": "per_hour"
+    },
+    "plumbing": {
+      "min": 75,
+      "max": 200,
+      "unit": "per_hour"
+    },
+    "electrical": {
+      "min": 80,
+      "max": 250,
+      "unit": "per_hour"
+    },
+    "painting": {
+      "min": 30,
+      "max": 60,
+      "unit": "per_hour"
+    }
+  },
+  "location": {
+    "lat": 42.2700,
+    "lon": -83.7500
+  },
+  "availability": [
+    {
+      "day": "monday",
+      "start": "08:00",
+      "end": "18:00"
+    },
+    {
+      "day": "tuesday",
+      "start": "08:00",
+      "end": "18:00"
+    },
+    {
+      "day": "wednesday",
+      "start": "08:00",
+      "end": "18:00"
+    },
+    {
+      "day": "thursday",
+      "start": "08:00",
+      "end": "18:00"
+    },
+    {
+      "day": "friday",
+      "start": "08:00",
+      "end": "18:00"
+    },
+    {
+      "day": "saturday",
+      "start": "09:00",
+      "end": "16:00"
+    }
+  ],
+  "attributes": {
+    "experience_years": 12,
+    "rating": 4.7,
+    "equipment": ["full_tool_set", "ladder", "generator"],
+    "insurance": true,
+    "licensed": true,
+    "bonded": true
+  },
+  "policy": {
+    "max_distance_km": 25,
+    "min_notice_hours": 48,
+    "payment_terms": "cash_check_card",
+    "guarantee_days": 30,
+    "emergency_service": true
+  }
+}

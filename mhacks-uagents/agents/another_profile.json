@@ -1,0 +1,73 @@
+{
+  "agent_id": "eco_gardener",
+  "owner": "Eco-Friendly Gardens LLC",
+  "services": ["lawn_mowing", "garden_maintenance", "landscaping"],
+  "pricing": {
+    "lawn_mowing": {
+      "min": 20,
+      "max": 45,
+      "unit": "per_visit"
+    },
+    "garden_maintenance": {
+      "min": 35,
+      "max": 70,
+      "unit": "per_visit"
+    },
+    "landscaping": {
+      "min": 100,
+      "max": 500,
+      "unit": "per_project"
+    }
+  },
+  "location": {
+    "lat": 42.2900,
+    "lon": -83.7300
+  },
+  "availability": [
+    {
+      "day": "monday",
+      "start": "07:00",
+      "end": "16:00"
+    },
+    {
+      "day": "tuesday",
+      "start": "07:00",
+      "end": "16:00"
+    },
+    {
+      "day": "wednesday",
+      "start": "07:00",
+      "end": "16:00"
+    },
+    {
+      "day": "thursday",
+      "start": "07:00",
+      "end": "16:00"
+    },
+    {
+      "day": "friday",
+      "start": "07:00",
+      "end": "16:00"
+    },
+    {
+      "day": "saturday",
+      "start": "08:00",
+      "end": "14:00"
+    }
+  ],
+  "attributes": {
+    "experience_years": 8,
+    "rating": 4.9,
+    "equipment": ["electric_mower", "manual_tools", "organic_fertilizers"],
+    "insurance": true,
+    "licensed": true,
+    "eco_certified": true
+  },
+  "policy": {
+    "max_distance_km": 15,
+    "min_notice_hours": 12,
+    "payment_terms": "card_preferred",
+    "guarantee_days": 14,
+    "eco_friendly_only": true
+  }
+}

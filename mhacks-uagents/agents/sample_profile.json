@@ -1,0 +1,66 @@
+{
+  "agent_id": "lawn_care_pro",
+  "owner": "John's Lawn Care",
+  "services": ["lawn_mowing", "hedge_trimming", "garden_maintenance"],
+  "pricing": {
+    "lawn_mowing": {
+      "min": 25,
+      "max": 50,
+      "unit": "per_visit"
+    },
+    "hedge_trimming": {
+      "min": 30,
+      "max": 60,
+      "unit": "per_visit"
+    },
+    "garden_maintenance": {
+      "min": 40,
+      "max": 80,
+      "unit": "per_visit"
+    }
+  },
+  "location": {
+    "lat": 42.2808,
+    "lon": -83.7430
+  },
+  "availability": [
+    {
+      "day": "monday",
+      "start": "08:00",
+      "end": "17:00"
+    },
+    {
+      "day": "tuesday",
+      "start": "08:00",
+      "end": "17:00"
+    },
+    {
+      "day": "wednesday",
+      "start": "08:00",
+      "end": "17:00"
+    },
+    {
+      "day": "thursday",
+      "start": "08:00",
+      "end": "17:00"
+    },
+    {
+      "day": "friday",
+      "start": "08:00",
+      "end": "17:00"
+    }
+  ],
+  "attributes": {
+    "experience_years": 5,
+    "rating": 4.8,
+    "equipment": ["professional_mower", "hedge_trimmer", "leaf_blower"],
+    "insurance": true,
+    "licensed": true
+  },
+  "policy": {
+    "max_distance_km": 10,
+    "min_notice_hours": 24,
+    "payment_terms": "cash_or_card",
+    "guarantee_days": 7
+  }
+}
