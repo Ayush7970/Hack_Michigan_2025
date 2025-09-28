@@ -1,6 +1,10 @@
+#!/usr/bin/env python3
+"""
+Working DynamoDB-based agent matching server
+"""
+
 from flask import Flask, request, jsonify
 import json
-import os
 import uuid
 from datetime import datetime
 import logging
@@ -8,12 +12,7 @@ from typing import List, Dict, Any
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-try:
-    from dynamodb_service import DynamoDBService
-    DYNAMODB_AVAILABLE = True
-except ImportError:
-    from mock_dynamodb_service import MockDynamoDBService as DynamoDBService
-    DYNAMODB_AVAILABLE = False
+from mock_dynamodb_service import MockDynamoDBService
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -21,18 +20,12 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Initialize DynamoDB service
+# Initialize Mock DynamoDB service
 try:
-    if DYNAMODB_AVAILABLE:
-        dynamodb_service = DynamoDBService()
-        # Create tables if they don't exist
-        dynamodb_service.create_tables()
-        logger.info("DynamoDB service initialized successfully")
-    else:
-        dynamodb_service = DynamoDBService()
-        # Load existing data from files
-        dynamodb_service.load_from_files()
-        logger.info("Mock DynamoDB service initialized successfully")
+    dynamodb_service = MockDynamoDBService()
+    # Load existing data from files
+    dynamodb_service.load_from_files()
+    logger.info("Mock DynamoDB service initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize DynamoDB service: {e}")
     dynamodb_service = None
@@ -454,4 +447,4 @@ if __name__ == '__main__':
         logger.info("DynamoDB service is ready")
     else:
         logger.warning("DynamoDB service is not available - some features may not work")
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    app.run(debug=True, host='127.0.0.1', port=3000)

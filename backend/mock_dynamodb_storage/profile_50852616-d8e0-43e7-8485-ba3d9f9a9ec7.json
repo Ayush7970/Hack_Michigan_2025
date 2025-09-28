@@ -1,0 +1,33 @@
+{
+  "id": "50852616-d8e0-43e7-8485-ba3d9f9a9ec7",
+  "timestamp": "2025-09-28T00:09:39.370144",
+  "name": "Test Agent",
+  "address": "test_address_123",
+  "job": "Software Developer",
+  "averagePrice": 75.0,
+  "tags": [
+    "python",
+    "testing"
+  ],
+  "location": [
+    "Test City",
+    "TS"
+  ],
+  "location_city": "Test City",
+  "description": "Test agent for component testing",
+  "profile_data": {
+    "name": "Test Agent",
+    "address": "test_address_123",
+    "job": "Software Developer",
+    "averagePrice": 75.0,
+    "tags": [
+      "python",
+      "testing"
+    ],
+    "location": [
+      "Test City",
+      "TS"
+    ],
+    "description": "Test agent for component testing"
+  }
+}

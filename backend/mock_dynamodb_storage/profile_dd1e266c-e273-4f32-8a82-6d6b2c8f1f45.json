@@ -1,0 +1,29 @@
+{
+  "id": "dd1e266c-e273-4f32-8a82-6d6b2c8f1f45",
+  "timestamp": "2025-09-28T00:13:46.398405",
+  "name": "Test Agent",
+  "address": "test123",
+  "job": "Developer",
+  "averagePrice": 50.0,
+  "tags": [
+    "python"
+  ],
+  "location": [
+    "NYC"
+  ],
+  "location_city": "NYC",
+  "description": "Test agent",
+  "profile_data": {
+    "name": "Test Agent",
+    "address": "test123",
+    "job": "Developer",
+    "averagePrice": 50.0,
+    "tags": [
+      "python"
+    ],
+    "location": [
+      "NYC"
+    ],
+    "description": "Test agent"
+  }
+}

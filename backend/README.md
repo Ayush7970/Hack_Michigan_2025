@@ -1,23 +1,48 @@
-# JSON Storage Server
+# DynamoDB Agent Matching Server
 
-A Python Flask server that accepts JSON data via POST requests and stores it uniquely for later retrieval.
+A Python Flask server that uses AWS DynamoDB to store agent profiles and conversations, with intelligent matching capabilities.
 
 ## Features
 
-- **POST /store** - Store uagent JSON data and get a unique ID
-- **GET /retrieve/<id>** - Retrieve stored uagent data by unique ID
-- **GET /list** - List all stored uagent IDs
-- **POST /match** - Find matching uagent based on description
+### Profile Management
+- **POST /store** - Store agent profile data and get a unique ID
+- **GET /retrieve/<id>** - Retrieve stored agent data by unique ID
+- **GET /list** - List all stored agent IDs
+- **POST /match** - Find matching agent based on description
+
+### Conversation Management
+- **POST /conversation** - Store conversation messages
+- **GET /conversation/<id>** - Retrieve conversation by ID
+- **GET /agent/<id>/conversations** - Get all conversations for an agent
+
+### System
 - **GET /health** - Health check endpoint
-- File-based storage with unique UUID identifiers
+- DynamoDB-based storage with unique UUID identifiers
 - Automatic metadata tracking (timestamp, ID)
 - Error handling and logging
+- Semantic matching using sentence transformers
+
+## Prerequisites
+
+- Python 3.7+
+- AWS Account with DynamoDB access
+- AWS CLI configured with appropriate credentials
 
 ## Installation
 
 1. Install dependencies:
 ```bash
 pip install -r requirements.txt
+```
+
+2. Configure AWS credentials:
+```bash
+aws configure
+```
+
+3. (Optional) Migrate existing JSON data:
+```bash
+python migrate_to_dynamodb.py
 ```
 
 ## Usage
@@ -50,6 +75,11 @@ The server will start on `http://localhost:8080`
 Test the server:
 ```bash
 python test_server.py
+```
+
+Test DynamoDB functionality:
+```bash
+python test_dynamodb.py
 ```
 
 ## API Endpoints
@@ -86,6 +116,27 @@ curl -X POST http://localhost:8080/match \
 curl http://localhost:8080/list
 ```
 
+### Store Conversation
+```bash
+curl -X POST http://localhost:8080/conversation \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agent_id": "agent-uuid-here",
+    "message": "Hello! I need help with plumbing.",
+    "sender": "user"
+  }'
+```
+
+### Get Conversation
+```bash
+curl http://localhost:8080/conversation/<conversation_id>
+```
+
+### Get Agent Conversations
+```bash
+curl http://localhost:8080/agent/<agent_id>/conversations
+```
+
 ### Health Check
 ```bash
 curl http://localhost:8080/health
@@ -112,10 +163,27 @@ The matching system uses:
 
 ## Storage
 
-JSON data is stored in the `json_storage/` directory with the following structure:
-- Each file is named `<unique_id>.json`
-- Files contain the original data plus metadata (ID, timestamp)
-- Data persists between server restarts
+Data is stored in AWS DynamoDB with the following structure:
+
+### Tables
+- **agent-profiles**: Stores agent profile information
+- **agent-conversations**: Stores conversation messages
+
+### DynamoDB Schema
+
+#### agent-profiles Table
+- **Primary Key**: `id` (String) - Unique agent identifier
+- **Attributes**: name, address, job, averagePrice, tags, location, description, timestamp
+- **Global Secondary Indexes**:
+  - `job-index`: Query by job title
+  - `location-index`: Query by location
+
+#### agent-conversations Table
+- **Primary Key**: `conversation_id` (String) - Unique conversation identifier
+- **Sort Key**: `timestamp` (String) - Message timestamp
+- **Attributes**: agent_id, message, sender
+- **Global Secondary Index**:
+  - `agent-conversations-index`: Query conversations by agent
 
 ## Example Response
 
