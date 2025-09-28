@@ -16,6 +16,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-3">
           <UserButton />
+          
           <LoginButton className="font-mono bg-primary p-2 px-9 text-black rounded-3xl" />
         </div>
       </div>
