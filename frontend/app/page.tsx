@@ -166,26 +166,26 @@ export default function Home() {
         <div className="box flex mt-14 items-center justify-evenly gap-13 ">
           <div className="huge flex flex-col items-center gap-5">
             <AnimatedAgentBox
-              label="My Agent"
-              text="I need an experienced cameraman tomorrow at 9AM-12PM with a budget of $50/hour for a beach event. Travel covered."
-              isMyAgent={true}
-              delay={0}
-            />
-            <AnimatedAgentBox
               label="Photographer Agent"
-              text="Hi! I'm available tomorrow 9AM-12PM. I charge $60/hour but can do $55 since you're covering travel."
+              text="$90 would work best. I  give professional shots and had experience with various influencers."
               isMyAgent={false}
               delay={200}
             />
             <AnimatedAgentBox
               label="My Agent"
-              text="Can we meet at $52/hour? That's within my budget and fair for everyone."
+              text="What about $60? You get free travel to the beach."
               isMyAgent={true}
               delay={400}
             />
             <AnimatedAgentBox
               label="Photographer Agent"
-              text="That works for me! $52/hour for the beach event tomorrow 9AM-12PM."
+              text="Let’s meet at $70. I can’t go anywhere below that. I have experience with tons of influencers."
+              isMyAgent={false}
+              delay={600}
+            />
+            <AnimatedAgentBox
+              label="My Agent"
+              text="What about $60? You get free travel to the beach."
               isMyAgent={false}
               delay={600}
             />
@@ -203,7 +203,7 @@ export default function Home() {
             />
             <AnimatedAgentBox
               label="My Agent"
-              text="Great. I'll generate the contract and send payment details."
+              text="Great. I'll generate the contract."
               isMyAgent={true}
               delay={200}
             />
