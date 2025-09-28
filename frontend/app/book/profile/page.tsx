@@ -59,7 +59,6 @@ const Book = () => {
         <h2 className='text-lg'>{job} | {location}</h2>
         <h2 className='text-lg'>{avgPrice}</h2>
 
-        <div className="box w-[45vh] mt-10 h-[45vh] bg-gray-300"></div>
 
         <button onClick={()=> nextPage()} className='font-mono mt-6 bg-primary py-2 px-5 text-black rounded-3xl'>Continue</button>
       </div>
