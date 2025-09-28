@@ -30,4 +30,3 @@ export const createProfile = async (
         return null;
     }
 }
-
