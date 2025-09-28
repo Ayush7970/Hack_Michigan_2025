@@ -1,52 +1,43 @@
-import axios from 'axios';
+// Simplified negotiation services for compact pipeline
 
-const api = axios.create({
-    baseURL: 'http://localhost:8001',
-});
-
-export const sendInput = async (
-    input:string, address:string
+export const sendNegotiationMessage = async (
+    message: string,
+    agentProfile: any,
+    conversationId: string = 'default'
 ) => {
-    console.log("🔥 SERVICE: sendInput called");
-    console.log("📨 Input:", input);
-    console.log("🎯 Address:", address);
+    console.log("🔥 NEGOTIATION: Sending message");
+    console.log("📨 Message:", message);
+    console.log("🤖 Agent:", agentProfile?.name);
 
-    const payload = {
-        input: input,
-        address: address
-    };
-    console.log("📦 Payload:", JSON.stringify(payload, null, 2));
-
-    try{
-        console.log("🌐 Making fetch request to http://localhost:8001/rest/post");
-
-        const response = await fetch('http://localhost:8001/rest/post', {
+    try {
+        const response = await fetch('http://localhost:8001/negotiate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({
+                message: message,
+                agent_profile: agentProfile,
+                conversation_id: conversationId
+            }),
         });
-
-        console.log("📊 Response status:", response.status);
-        console.log("📊 Response ok:", response.ok);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log("📄 Response data:", data);
+        console.log("📄 Response:", data);
         return data;
-    }catch(err){
-        console.error("💥 SERVICE: Error in sendInput:", err);
+    } catch (err) {
+        console.error("💥 Error sending message:", err);
         return null;
     }
-}
+};
 
-export const getConversation = async () => {
-    try{
-        const response = await fetch('http://localhost:8001/conversation', {
+export const getConversation = async (conversationId: string = 'default') => {
+    try {
+        const response = await fetch(`http://localhost:8001/conversation/${conversationId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -59,9 +50,12 @@ export const getConversation = async () => {
 
         const data = await response.json();
         return data;
-    }catch(err){
-        console.log(err);
+    } catch (err) {
+        console.error("💥 Error getting conversation:", err);
         return null;
     }
-}
+};
+
+// Legacy support - keeping old function name
+export const sendInput = sendNegotiationMessage;
 

@@ -2,7 +2,7 @@
 import React from 'react'
 import MiniNavbar from '@/components/MiniNavbar'
 import { useState, useEffect } from 'react'
-import { sendInput, getConversation } from '@/lib/negotiationServices'
+import { sendNegotiationMessage, getConversation } from '@/lib/negotiationServices'
 
 
 const Book = () => {
@@ -15,7 +15,8 @@ const Book = () => {
   const [currentInput, setCurrentInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [negotiationComplete, setNegotiationComplete] = useState(false);
-  const [lastMessageCount, setLastMessageCount] = useState(0);
+  const [conversationId, setConversationId] = useState('default');
+  const [agentProfile, setAgentProfile] = useState(null);
 
   useEffect(() => {
     const profileData = localStorage.getItem('profileData');
@@ -26,79 +27,111 @@ const Book = () => {
       setName(parsedData.name);
       setConversation(parsedData.job);
       setOriginalInput(parsedData.originalInput);
+
+      // Set up agent profile for negotiation
+      const matchData = parsedData.originalMatchData;
+      if (matchData && matchData.matched_uagent) {
+        setAgentProfile(matchData.matched_uagent);
+      }
+
+      // Create unique conversation ID
+      const newConversationId = `conv_${Date.now()}`;
+      setConversationId(newConversationId);
+
       console.log("Profile data:", parsedData);
       localStorage.removeItem('profileData');
 
-      // Initialize conversation with original input if available
-      if (parsedData.originalInput) {
-        setMessages([
-          { role: 'user', content: parsedData.originalInput, timestamp: new Date() }
-        ]);
+      // Start conversation with original input if available
+      if (parsedData.originalInput && matchData?.matched_uagent) {
+        // Use the new conversation ID directly instead of state
+        startNegotiationWithId(parsedData.originalInput, matchData.matched_uagent, newConversationId);
       }
     }
   }, []);
 
-  // Poll for conversation updates
-  useEffect(() => {
-    if (!address) return;
-
-    const pollConversation = async () => {
-      try {
-        const data = await getConversation();
-        if (data && data.messages) {
-          // Only update if we have new messages
-          if (data.messages.length > lastMessageCount) {
-            const formattedMessages = data.messages.map((msg, index) => ({
-              role: msg.role === 'buyer' ? 'user' : msg.role === 'seller' ? 'agent' : msg.role,
-              content: msg.content,
-              timestamp: new Date()
-            }));
-            setMessages(formattedMessages);
-            setLastMessageCount(data.messages.length);
-          }
-
-          // Update negotiation status
-          setNegotiationComplete(data.is_complete || false);
-        }
-      } catch (error) {
-        console.error("Error polling conversation:", error);
+  const startNegotiationWithId = async (initialMessage: string, profile: any, convId: string) => {
+    setIsLoading(true);
+    try {
+      const response = await sendNegotiationMessage(initialMessage, profile, convId);
+      if (response && response.success) {
+        // Load the conversation to get all messages
+        loadConversationWithId(convId);
       }
-    };
+    } catch (error) {
+      console.error("Error starting negotiation:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    // Poll every 2 seconds
-    const interval = setInterval(pollConversation, 2000);
+  const startNegotiation = async (initialMessage: string, profile: any) => {
+    setIsLoading(true);
+    try {
+      const response = await sendNegotiationMessage(initialMessage, profile, conversationId);
+      if (response && response.success) {
+        // Load the conversation to get all messages
+        loadConversation();
+      }
+    } catch (error) {
+      console.error("Error starting negotiation:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    // Initial poll
-    pollConversation();
+  const loadConversationWithId = async (convId: string) => {
+    try {
+      const data = await getConversation(convId);
+      if (data && data.messages) {
+        const formattedMessages = data.messages.map((msg) => ({
+          role: msg.role === 'agent' ? 'agent' : 'user',
+          content: msg.content,
+          timestamp: new Date(msg.timestamp)
+        }));
+        setMessages(formattedMessages);
+        setNegotiationComplete(data.is_complete || false);
+      }
+    } catch (error) {
+      console.error("Error loading conversation:", error);
+    }
+  };
 
-    return () => clearInterval(interval);
-  }, [address, lastMessageCount]);
+  const loadConversation = async () => {
+    try {
+      const data = await getConversation(conversationId);
+      if (data && data.messages) {
+        const formattedMessages = data.messages.map((msg) => ({
+          role: msg.role === 'agent' ? 'agent' : 'user',
+          content: msg.content,
+          timestamp: new Date(msg.timestamp)
+        }));
+        setMessages(formattedMessages);
+        setNegotiationComplete(data.is_complete || false);
+      }
+    } catch (error) {
+      console.error("Error loading conversation:", error);
+    }
+  };
 
   const sendMessage = async () => {
-    if (!currentInput.trim() || !address || isLoading || negotiationComplete) return;
-
-    console.log("🚀 FRONTEND: About to send message");
-    console.log("📨 Message:", currentInput.trim());
-    console.log("🎯 Address:", address);
-    console.log("🔗 API URL: http://localhost:8001/rest/post");
+    if (!currentInput.trim() || !agentProfile || isLoading || negotiationComplete) return;
 
     const messageToSend = currentInput.trim();
     setCurrentInput("");
     setIsLoading(true);
 
     try {
-      const response = await sendInput(messageToSend, address);
-      console.log("📡 FRONTEND: API Response:", response);
+      const response = await sendNegotiationMessage(messageToSend, agentProfile, conversationId);
 
       if (response && response.success) {
-        // The conversation will be updated via polling
-        console.log("✅ FRONTEND: Message sent successfully");
+        // Reload conversation to get updated messages
+        await loadConversation();
+        console.log("✅ Message sent and conversation updated");
       } else {
-        console.error("❌ FRONTEND: API returned unsuccessful response:", response);
         throw new Error("Failed to send message");
       }
     } catch (error) {
-      console.error("💥 FRONTEND: Error sending message:", error);
+      console.error("💥 Error sending message:", error);
       const errorMessage = {
         role: 'system',
         content: 'Failed to send message. Please try again.',
@@ -117,11 +150,11 @@ const Book = () => {
     }
   };
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div className="min-h-screen  text-white flex flex-col">
       <MiniNavbar/>
 
       {/* Header */}
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-4 px-16 font-mono  border-gray-800">
         <h2 className="text-xl font-semibold">Negotiating with {name}</h2>
         <p className="text-gray-400">{conversation}</p>
         {negotiationComplete && (
@@ -132,7 +165,7 @@ const Book = () => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 font-inter overflow-y-auto p-4 px-16 space-y-4">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -141,16 +174,14 @@ const Book = () => {
             <div
               className={`max-w-[70%] p-3 rounded-lg ${
                 message.role === 'user'
-                  ? 'bg-primary text-black'
+                  ? 'border-1-primary text-white'
                   : message.role === 'system'
                   ? 'bg-red-900 text-red-200'
                   : 'bg-gray-800 text-white'
               }`}
             >
               <p className="whitespace-pre-wrap">{message.content}</p>
-              <p className="text-xs opacity-60 mt-1">
-                {message.timestamp.toLocaleTimeString()}
-              </p>
+              
             </div>
           </div>
         ))}
@@ -168,29 +199,7 @@ const Book = () => {
         )}
       </div>
 
-      {/* Input */}
-      {!negotiationComplete && (
-        <div className="border-t border-gray-800 p-4">
-          <div className="flex space-x-2">
-            <textarea
-              value={currentInput}
-              onChange={(e) => setCurrentInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              className="flex-1 bg-gray-800 text-white p-3 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-              rows={1}
-              disabled={isLoading}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={isLoading || !currentInput.trim()}
-              className="px-6 py-3 bg-primary text-black rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-transform"
-            >
-              Send
-            </button>
-          </div>
-        </div>
-      )}
+      
     </div>
   )
 }

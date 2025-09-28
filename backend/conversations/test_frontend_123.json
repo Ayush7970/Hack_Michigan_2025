@@ -1,0 +1,59 @@
+{
+  "conversation_id": "test_frontend_123",
+  "messages": [
+    {
+      "role": "user",
+      "content": "I need a plumber to fix my sink"
+    },
+    {
+      "role": "agent",
+      "content": "Hello there! John Smith, Plumber, at your service. I can definitely help you get that sink fixed. I pride myself on providing quality services.\n\nMy standard rate is $75 an hour. Could you tell me a little more about what's going on with your sink? Knowing the issue will help me give you a better idea of how long the repair might take."
+    },
+    {
+      "role": "user",
+      "content": "Thanks, John. $75/hr is a bit more than I was hoping. It's a slow drip under the kitchen sink, mostly when the faucet is running. Do you have a minimum service charge or a diagnostic fee? Could we discuss a total estimate?"
+    },
+    {
+      "role": "agent",
+      "content": "I understand $75/hr might be a bit more than you expected. For a common issue like a slow drip, I usually don't charge a separate diagnostic fee; my hourly rate covers the assessment and the fix.\n\nTo give you the most accurate total estimate, it's really best for me to take a quick look. It sounds like it could be a straightforward seal or connection, which often doesn't take long at all. Would you be open to me coming by for a quick assessment to confirm the scope?"
+    },
+    {
+      "role": "user",
+      "content": "Okay, I'm open to you coming by. What's the *typical* time you'd spend on-site for assessing and fixing a straightforward slow drip like this? I just want to manage my expectations on the total cost."
+    },
+    {
+      "role": "agent",
+      "content": "That's a fair question, and I like to be transparent. For a straightforward slow drip, like what you're describing, I'd typically estimate it to take anywhere from **30 minutes to an hour** on-site, including the assessment and the repair.\n\nMost of these issues are quick fixes once I've identified the exact source. How does that sound? If you're comfortable, we could go ahead and schedule a time for me to come by."
+    },
+    {
+      "role": "user",
+      "content": "Okay, 30-60 minutes sounds reasonable for a straightforward fix. So, the minimum charge would be $37.50 for the first 30 minutes, plus any parts needed? That helps clarify things."
+    },
+    {
+      "role": "agent",
+      "content": "That's exactly right! For a straightforward fix within that 30-minute timeframe, the minimum service charge would be $37.50, plus the cost of any necessary parts.\n\nDoes that sound like a plan that works for you? If so, we can look at getting you scheduled. What day and time might be best for me to come by?"
+    },
+    {
+      "role": "user",
+      "content": "Okay, that sounds like a clear plan. What kind of parts are usually needed for a slow drip, and what's their typical cost range? Are you able to provide an estimate for parts before proceeding with the repair?"
+    },
+    {
+      "role": "agent",
+      "content": "That's a great question! For a slow drip, we're usually looking at small, inexpensive parts like O-rings, washers, or sometimes a new compression fitting. These typically range from just a few dollars up to about $20-$30 if a specific faucet cartridge is needed.\n\nAbsolutely, once I'm on-site and identify the exact part required, I'll always show you and give you a precise cost estimate for it *before* I proceed with the repair.\n\nDoes that sound good? If so, we can get you on the schedule!"
+    },
+    {
+      "role": "user",
+      "content": "Okay, that sounds very clear and fair. Knowing the minimum charge and parts cost breakdown helps a lot. I'm comfortable moving forward. What's your availability like in the coming days to take a look?"
+    }
+  ],
+  "agent_profile": {
+    "name": "John Smith",
+    "job": "Plumber",
+    "averagePrice": 75
+  },
+  "user_request": "I need a plumber to fix my sink",
+  "is_complete": true,
+  "created_at": 1759053706.6167035,
+  "completed_at": 1759053786.312235,
+  "completion_reason": "agreement_reached"
+}
