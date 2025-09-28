@@ -19,11 +19,14 @@ export default function Home() {
       <div className="relative z-10">
         <Navbar/>
         <div className="hero h-[calc(100vh-120px)] relative flex items-center justify-center tracking-tighter font-sans font-medium text-6xl text-white w-screen">
-          <div className="text-center space-y-3 z-20">
-            <h1 className="drop-shadow-2xl">Automize Negotiations.</h1>
-            <h1 className="text-primary drop-shadow-2xl">Save your time.</h1>
-            <Link className="text-xl tracking-normal text-black font-mono bg-primary p-2 px-8 rounded-xl book-button hover:bg-yellow-300 transition-colors" href='/book'>Book Services</Link>
-          </div>
+              <div className="text-center space-y-3 z-20">
+                <h1 className="drop-shadow-2xl">Automize Negotiations.</h1>
+                <h1 className="text-primary drop-shadow-2xl">Save your time.</h1>
+                <div className="flex gap-4 justify-center">
+                  <Link className="text-xl tracking-normal text-black font-mono bg-primary p-2 px-8 rounded-xl book-button hover:bg-yellow-300 transition-colors" href='/book'>Book Services</Link>
+                  <Link className="text-xl tracking-normal text-black font-mono bg-white/20 backdrop-blur-sm p-2 px-8 rounded-xl hover:bg-white/30 transition-colors" href='/conversations'>Live Conversations</Link>
+                </div>
+              </div>
         </div>
         
       </div>
