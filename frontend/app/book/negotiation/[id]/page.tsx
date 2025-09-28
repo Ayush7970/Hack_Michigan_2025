@@ -288,7 +288,7 @@ const Book = () => {
         )}
       </div>
       <Link
-        href="/generate-pdf"
+        href={`/generate-pdf?conversationId=${conversationId}`}
         className="inline-block px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500"
       >
         Create Contract PDF

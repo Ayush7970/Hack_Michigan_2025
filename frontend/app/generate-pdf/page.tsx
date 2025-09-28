@@ -1,19 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { jsPDF } from "jspdf";
 
 export default function GeneratePdfPage() {
+  const searchParams = useSearchParams();
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const [isWorking, setIsWorking] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [fetchedText, setFetchedText] = useState<string>(""); // ✅ hold fetched (now beautified) text
+
+  useEffect(() => {
+    const convId = searchParams.get('conversationId');
+    setConversationId(convId);
+  }, [searchParams]);
 
   const handleGenerate = async () => {
     try {
       setIsWorking(true);
       setStatus("Fetching text…");
 
-      const res = await fetch("/api/conversation", { method: "GET" });
+      const apiUrl = conversationId
+        ? `/api/conversation?file=${conversationId}.json`
+        : "/api/conversation";
+      const res = await fetch(apiUrl, { method: "GET" });
       if (!res.ok) throw new Error(`Backend error (${res.status})`);
       const txt = await res.text();
 
@@ -83,7 +94,12 @@ export default function GeneratePdfPage() {
         <h1 className="text-xl font-semibold mb-2">Generate PDF from Backend Text</h1>
         <p className="text-sm text-gray-400 mb-6">
           Click the button to fetch text from{" "}
-          <code className="text-gray-300">/api/placeholder</code> and convert it to a PDF.
+          <code className="text-gray-300">/api/conversation</code> and convert it to a PDF.
+          {conversationId && (
+            <span className="block mt-2">
+              Using conversation: <code className="text-green-300">{conversationId}</code>
+            </span>
+          )}
         </p>
 
         <button
