@@ -5,7 +5,7 @@ const Navbar = () => {
   return (
     <nav className='w-full border-b-white border-b-1'>
       <div className='flex justify-between items-center py-8 text-white px-16'>
-        <h1 className='font-mono font-bold text-3xl'>oParley</h1>
+        <Link href='/' className='font-mono font-bold text-3xl'>oParley</Link>
         <div className="flex gap-30 font-mono text-lg">
             <Link href='/'>Home</Link>
             <Link href='/'>About</Link>

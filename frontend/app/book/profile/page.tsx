@@ -1,7 +1,8 @@
 "use client";
 import React from 'react'
 import MiniNavbar from '@/components/MiniNavbar'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 
 const Book = () => {
@@ -9,6 +10,40 @@ const Book = () => {
   const [job, setJob] = useState("Plumber");
   const [location, setLocation] = useState("Ann Arbor, MI");
   const [avgPrice, setAvgPrice] = useState("$45/hr");
+  const [sendInputResult, setSendInputResult] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const result = localStorage.getItem('sendInput');
+    
+    if (result) {
+      const parsedResult = JSON.parse(result);
+      setSendInputResult(parsedResult);
+      console.log(parsedResult);
+      localStorage.removeItem('sendInput');
+
+      // Extract data from the result structure
+      const matchData = parsedResult.result;
+      setJob(matchData?.matched_uagent?.job || "Plumber");
+      setName(matchData?.matched_uagent?.name || "David Bowers");
+      setLocation((matchData?.matched_uagent?.location || ["Ann Arbor", "MI"]).join(", "));
+      setAvgPrice(`$${matchData?.matched_uagent?.averagePrice || 45}/hr`);
+    }
+  }, []);
+
+  const nextPage = () => {
+    const profileData = {
+      name,
+      job,
+      location,
+      avgPrice,
+      address: sendInputResult?.result?.matched_address,
+      originalInput: sendInputResult?.originalInput,
+      originalMatchData: sendInputResult?.result
+    };
+    localStorage.setItem('profileData', JSON.stringify(profileData));
+    router.push('/book/negotiation');
+  }
   return (
     <div className="min-h-screen relative">
       <MiniNavbar/>
@@ -19,7 +54,7 @@ const Book = () => {
 
         <div className="box w-[45vh] mt-10 h-[45vh] bg-gray-300"></div>
 
-        Loading..
+        <button onClick={()=> nextPage()} className='font-mono mt-6 bg-primary py-2 px-5 text-black rounded-3xl'>Continue</button>
       </div>
     </div>
   )

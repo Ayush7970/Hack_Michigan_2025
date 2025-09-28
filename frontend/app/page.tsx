@@ -22,8 +22,8 @@ export default function Home() {
         </div>
 
         <div className="absolute right-50 top-1/2 transform -translate-y-1/2 space-y-16   ">
-          <img src="art.png" alt="art" className="w-20 h-20 float3" />
-          <img src="hand.png" alt="hand" className="w-20 h-20 float4" />
+          <img src="art.png" alt="art" className="w-20   h-20  float3" />
+          <img src="hand.png" alt="hand" className="w-20   h-20  float4" />
         </div>
       </div>
       <div className="hero-lower text-center mt-21 font-mono font-bold text-2xl">
