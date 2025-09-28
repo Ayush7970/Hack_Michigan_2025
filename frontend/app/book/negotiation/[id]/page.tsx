@@ -4,7 +4,7 @@ import MiniNavbar from '@/components/MiniNavbar'
 import { useState, useEffect, useRef } from 'react'
 import { sendNegotiationMessage, getConversation } from '@/lib/negotiationServices'
 import { io, Socket } from 'socket.io-client'
-
+import Link from 'next/link';
 
 const Book = () => {
   const [name, setName] = useState("David Bowers");
@@ -287,6 +287,12 @@ const Book = () => {
           </div>
         )}
       </div>
+      <Link
+        href="/generate-pdf"
+        className="inline-block px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500"
+      >
+        Create Contract PDF
+      </Link>
 
       
     </div>
