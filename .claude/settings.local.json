@@ -10,7 +10,8 @@
       "Bash(curl -X POST http://localhost:8001/negotiate -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"I need a plumber to fix my sink\"\",\"\"agent_profile\"\":{\"\"name\"\":\"\"John Smith\"\",\"\"job\"\":\"\"Plumber\"\",\"\"averagePrice\"\":75},\"\"conversation_id\"\":\"\"test_frontend_123\"\"}\" --max-time 10)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Read(//c/Users/Clarissa/Pictures/Screenshots/**)"
+      "Read(//c/Users/Clarissa/Pictures/Screenshots/**)",
+      "Bash(npm uninstall:*)"
     ],
     "deny": [],
     "ask": []
