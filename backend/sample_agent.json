@@ -1,0 +1,9 @@
+{
+  "name": "John Smith",
+  "address": "0x1234567890abcdef1234567890abcdef12345678",
+  "job": "Electrician",
+  "averagePrice": 95.0,
+  "tags": ["electrical", "wiring", "outlets", "lighting", "safety"],
+  "location": ["Los Angeles", "CA"],
+  "description": "Licensed electrician with 10 years of experience. Specializes in residential and commercial electrical work, including wiring, outlets, lighting installation, and safety inspections."
+}

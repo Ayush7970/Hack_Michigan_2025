@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit, join_room, leave_room
 import threading
 
 # Load environment variables
@@ -299,12 +300,39 @@ bureau.add(service_agent)
 # Flask API for frontend communication
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000'])
+socketio = SocketIO(app, cors_allowed_origins="http://localhost:3000")
+
+# WebSocket event handlers
+@socketio.on('join_conversation')
+def on_join_conversation(data):
+    conversation_id = data['conversation_id']
+    print(f"🔌 WEBSOCKET: Client requesting to join conversation room: {conversation_id}")
+    join_room(conversation_id)
+    print(f"🔌 WEBSOCKET: Client successfully joined conversation room: {conversation_id}")
+    emit('joined_conversation', {'conversation_id': conversation_id})
+    print(f"🔌 WEBSOCKET: Sent confirmation to client for room: {conversation_id}")
+
+@socketio.on('leave_conversation')
+def on_leave_conversation(data):
+    conversation_id = data['conversation_id']
+    leave_room(conversation_id)
+    print(f"Client left conversation room: {conversation_id}")
+
+@socketio.on('connect')
+def on_connect():
+    print('🔌 WEBSOCKET: Client connected to WebSocket')
+    print(f'🔌 WEBSOCKET: Total connected clients: {len(socketio.server.manager.rooms)}')
+
+@socketio.on('disconnect')
+def on_disconnect():
+    print('🔌 WEBSOCKET: Client disconnected from WebSocket')
 
 @app.route('/negotiate', methods=['POST'])
 def negotiate():
     """Start negotiation and continue until completion automatically"""
+    print("🚀 NEGOTIATE: /negotiate endpoint called")
     try:
-        print("BUREAU: /negotiate endpoint called")
+        print("🚀 NEGOTIATE: Starting negotiation process")
 
         # Get and validate request data
         if not request.is_json:
@@ -354,13 +382,31 @@ def negotiate():
         # Store initial conversation
         conversations[conversation_id] = conv
         save_conversation_locally(conversation_id, conv)
+        
+        # Emit initial user message via WebSocket
+        print(f"🔌 WEBSOCKET: Emitting initial user message to room {conversation_id}")
+        print(f"🔌 WEBSOCKET: Message content: {user_message}")
+        print(f"🔌 WEBSOCKET: Checking if room {conversation_id} has clients...")
+        # Check room occupancy
+        if conversation_id in socketio.server.manager.rooms:
+            room_clients = len(socketio.server.manager.rooms[conversation_id])
+            print(f"🔌 WEBSOCKET: Room {conversation_id} has {room_clients} clients")
+        else:
+            print(f"🔌 WEBSOCKET: Room {conversation_id} does not exist yet")
+        socketio.emit('new_message', {
+            'role': 'user',
+            'content': user_message,
+            'conversation_id': conversation_id
+        }, room=conversation_id)
+        print(f"🔌 WEBSOCKET: Initial user message emitted successfully")
 
         max_turns = 20  # Prevent infinite loops
         turn_count = 0
 
+        print(f"🚀 NEGOTIATE: Starting negotiation loop with max {max_turns} turns")
         while turn_count < max_turns:
             turn_count += 1
-            print(f"BUREAU: Turn {turn_count}/{max_turns}")
+            print(f"🚀 NEGOTIATE: Turn {turn_count}/{max_turns}")
 
             # Generate agent response
             agent_response = ""
@@ -381,6 +427,23 @@ def negotiate():
             # Add agent response
             conv["messages"].append({"role": "agent", "content": agent_response})
             save_conversation_locally(conversation_id, conv)
+            
+            # Emit agent response via WebSocket
+            print(f"🔌 WEBSOCKET: Emitting agent response to room {conversation_id}")
+            print(f"🔌 WEBSOCKET: Agent response: {agent_response}")
+            print(f"🔌 WEBSOCKET: Checking if room {conversation_id} has clients...")
+            # Check room occupancy
+            if conversation_id in socketio.server.manager.rooms:
+                room_clients = len(socketio.server.manager.rooms[conversation_id])
+                print(f"🔌 WEBSOCKET: Room {conversation_id} has {room_clients} clients")
+            else:
+                print(f"🔌 WEBSOCKET: Room {conversation_id} does not exist yet")
+            socketio.emit('new_message', {
+                'role': 'agent',
+                'content': agent_response,
+                'conversation_id': conversation_id
+            }, room=conversation_id)
+            print(f"🔌 WEBSOCKET: Agent response emitted successfully")
 
             # Check if negotiation should continue using Gemini
             should_continue = check_should_continue_with_gemini(conv["messages"])
@@ -393,6 +456,15 @@ def negotiate():
                 conv["completion_reason"] = "agreement_reached"
                 save_conversation_locally(conversation_id, conv)
                 conversations[conversation_id] = conv
+                
+                # Emit negotiation completion via WebSocket
+                print(f"🔌 WEBSOCKET: Emitting negotiation completion to room {conversation_id}")
+                socketio.emit('negotiation_complete', {
+                    'conversation_id': conversation_id,
+                    'completion_reason': 'agreement_reached',
+                    'turns': turn_count
+                }, room=conversation_id)
+                print(f"🔌 WEBSOCKET: Negotiation completion emitted successfully")
 
                 return jsonify({
                     "success": True,
@@ -414,6 +486,16 @@ def negotiate():
             # Add buyer response
             conv["messages"].append({"role": "user", "content": buyer_response})
             save_conversation_locally(conversation_id, conv)
+            
+            # Emit buyer response via WebSocket
+            print(f"🔌 WEBSOCKET: Emitting buyer response to room {conversation_id}")
+            print(f"🔌 WEBSOCKET: Buyer response: {buyer_response}")
+            socketio.emit('new_message', {
+                'role': 'user',
+                'content': buyer_response,
+                'conversation_id': conversation_id
+            }, room=conversation_id)
+            print(f"🔌 WEBSOCKET: Buyer response emitted successfully")
 
             # Check again after buyer response
             should_continue = check_should_continue_with_gemini(conv["messages"])
@@ -498,9 +580,9 @@ def health_check():
     })
 
 def run_flask():
-    """Run Flask in a separate thread"""
-    print("FLASK: Starting Flask API on http://localhost:8001")
-    app.run(debug=False, host='0.0.0.0', port=8001, threaded=True)
+    """Run Flask with SocketIO in a separate thread"""
+    print("FLASK: Starting Flask API with WebSocket support on http://localhost:8001")
+    socketio.run(app, debug=False, host='0.0.0.0', port=8001, allow_unsafe_werkzeug=True)
 
 if __name__ == "__main__":
     print("BUREAU: Starting Bureau-based Negotiation System")
