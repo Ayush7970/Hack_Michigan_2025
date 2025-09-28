@@ -1,13 +1,21 @@
 "use client";
 import React from 'react'
 import MiniNavbar from '@/components/MiniNavbar'
+<<<<<<< HEAD:frontend/app/book/negotiation/[id]/page.tsx
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+=======
 import { useState, useEffect, useRef } from 'react'
+>>>>>>> e11d9bb7988c97e24918e4abed2a47cf911a4a8b:frontend/app/book/negotiation/page.tsx
 import { sendNegotiationMessage, getConversation } from '@/lib/negotiationServices'
 import { io, Socket } from 'socket.io-client'
 import axios from 'axios'
 
 
-const Book = () => {
+const NegotiationPage = () => {
+  const params = useParams()
+  const negotiationId = params.id as string
+
   const [name, setName] = useState("David Bowers");
   const [conversation, setConversation] = useState("Plumber");
   const [sendInputResult, setSendInputResult] = useState(null);
@@ -22,7 +30,6 @@ const Book = () => {
   }>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [negotiationComplete, setNegotiationComplete] = useState(false);
-  const [conversationId, setConversationId] = useState('default');
   const [agentProfile, setAgentProfile] = useState(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const socketRef = useRef<Socket | null>(null);
@@ -65,7 +72,7 @@ const Book = () => {
   };
 
   useEffect(() => {
-    const profileData = localStorage.getItem('profileData');
+    const profileData = localStorage.getItem(`profileData_${negotiationId}`);
     if (profileData) {
       const parsedData = JSON.parse(profileData);
       setSendInputResult(parsedData.originalMatchData);
@@ -80,18 +87,23 @@ const Book = () => {
         setAgentProfile(matchData.matched_uagent);
       }
 
-      // Create unique conversation ID
-      const newConversationId = `conv_${Date.now()}`;
-      setConversationId(newConversationId);
-
       console.log("Profile data:", parsedData);
-      localStorage.removeItem('profileData');
 
+<<<<<<< HEAD:frontend/app/book/negotiation/[id]/page.tsx
+      // Start conversation with original input if available
+      if (parsedData.originalInput && matchData?.matched_uagent) {
+        startNegotiation(parsedData.originalInput, matchData.matched_uagent);
+      }
+    } else {
+      // If no profile data, try to load existing conversation
+      loadConversation();
+=======
       // Store the data for later use when WebSocket is ready
       setOriginalInput(parsedData.originalInput);
       setAgentProfile(matchData?.matched_uagent);
+>>>>>>> e11d9bb7988c97e24918e4abed2a47cf911a4a8b:frontend/app/book/negotiation/page.tsx
     }
-  }, []);
+  }, [negotiationId]);
 
   // WebSocket connection and event handling
   useEffect(() => {
@@ -191,7 +203,7 @@ const Book = () => {
   const startNegotiation = async (initialMessage: string, profile: any) => {
     setIsLoading(true);
     try {
-      const response = await sendNegotiationMessage(initialMessage, profile, conversationId);
+      const response = await sendNegotiationMessage(initialMessage, profile, negotiationId);
       if (response && response.success) {
         // Load the conversation to get all messages
         loadConversation();
@@ -224,7 +236,7 @@ const Book = () => {
 
   const loadConversation = async () => {
     try {
-      const data = await getConversation(conversationId);
+      const data = await getConversation(negotiationId);
       if (data && data.messages) {
         const formattedMessages = data.messages.map((msg: any) => ({
           role: msg.role === 'agent' ? 'agent' : 'user',
@@ -235,12 +247,20 @@ const Book = () => {
         }));
         setMessages(formattedMessages);
         setNegotiationComplete(data.is_complete || false);
+
+        // If we have agent profile from conversation, set it
+        if (data.agent_profile && !agentProfile) {
+          setAgentProfile(data.agent_profile);
+          setName(data.agent_profile.name || "Agent");
+          setConversation(data.agent_profile.job || "Service Provider");
+        }
       }
     } catch (error) {
       console.error("Error loading conversation:", error);
     }
   };
 
+<<<<<<< HEAD:frontend/app/book/negotiation/page.tsx
   // Live conversation functions
   const createLiveConversation = async () => {
     setIsCreatingLiveConversation(true);
@@ -343,11 +363,53 @@ const Book = () => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+=======
+<<<<<<< HEAD:frontend/app/book/negotiation/[id]/page.tsx
+  const sendMessage = async () => {
+    if (!currentInput.trim() || !agentProfile || isLoading || negotiationComplete) return;
+
+    const messageToSend = currentInput.trim();
+    setCurrentInput("");
+    setIsLoading(true);
+
+    try {
+      const response = await sendNegotiationMessage(messageToSend, agentProfile, negotiationId);
+
+      if (response && response.success) {
+        // Reload conversation to get updated messages
+        await loadConversation();
+        console.log("✅ Message sent and conversation updated");
+      } else {
+        throw new Error("Failed to send message");
+      }
+    } catch (error) {
+      console.error("💥 Error sending message:", error);
+      const errorMessage = {
+        role: 'system',
+        content: 'Failed to send message. Please try again.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+=======
+>>>>>>> e11d9bb7988c97e24918e4abed2a47cf911a4a8b:frontend/app/book/negotiation/page.tsx
+>>>>>>> 028b20da277940ff009e20ae125390f5dfb3f0da:frontend/app/book/negotiation/[id]/page.tsx
   return (
     <div className="min-h-screen  text-white flex flex-col">
       <MiniNavbar/>
 
       {/* Header */}
+<<<<<<< HEAD:frontend/app/book/negotiation/page.tsx
       <div className="p-4 px-16 font-mono border-gray-800">
         <div className="flex justify-between items-start">
           <div>
@@ -364,6 +426,22 @@ const Book = () => {
                 AI Agents are negotiating...
               </div>
             )}
+=======
+<<<<<<< HEAD:frontend/app/book/negotiation/[id]/page.tsx
+      <div className="p-4 px-16 font-mono border-gray-800">
+        <h2 className="text-xl font-semibold">Negotiating with {name}</h2>
+        <p className="text-gray-400">{conversation}</p>
+        <p className="text-xs text-gray-500">ID: {negotiationId}</p>
+=======
+      <div className="p-4 px-16 font-mono  border-gray-800">
+        <h2 className="text-xl font-semibold">AI Agent Negotiation</h2>
+        <p className="text-gray-400">Watching {name} negotiate with the service provider</p>
+        <p className="text-gray-500 text-sm">Messages: {messages.length}</p>
+>>>>>>> e11d9bb7988c97e24918e4abed2a47cf911a4a8b:frontend/app/book/negotiation/page.tsx
+        {negotiationComplete && (
+          <div className="mt-2 px-3 py-1 bg-green-900 text-green-200 rounded-full text-sm inline-block">
+            Negotiation Complete
+>>>>>>> 028b20da277940ff009e20ae125390f5dfb3f0da:frontend/app/book/negotiation/[id]/page.tsx
           </div>
           
           {/* Live Conversation Controls */}
@@ -510,4 +588,4 @@ const Book = () => {
 }
 
 
-export default Book
+export default NegotiationPage

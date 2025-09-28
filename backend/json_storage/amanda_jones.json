@@ -1,0 +1,19 @@
+{
+  "data": {
+    "name": "Amanda Jones",
+    "address": "",
+    "job": "photographer",
+    "averagePrice": 50.0,
+    "tags": [
+      "photography",
+      "wedding photography",
+      "event photography",
+      "concert photography"
+    ],
+    "location": [],
+    "email": "amandaj@example.com",
+    "description": "I can shoot professional occasions like weddings, events, concerts, etc.",
+    "availability": [],
+    "personality": "Chill, and negotiation style is pretty tight."
+  }
+}

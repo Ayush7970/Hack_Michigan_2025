@@ -1,0 +1,17 @@
+{
+  "data": {
+    "name": "Clarissa",
+    "address": "",
+    "job": "video editing",
+    "averagePrice": 55.0,
+    "tags": [
+      "AE",
+      "color grading",
+      "clean editing"
+    ],
+    "location": [],
+    "email": "clarissa@example.com",
+    "description": "I use AE and I edit clean stuff with cool color grade",
+    "availability": []
+  }
+}

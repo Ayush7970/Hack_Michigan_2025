@@ -32,6 +32,9 @@ const Book = () => {
   }, []);
 
   const nextPage = () => {
+    // Generate unique negotiation ID
+    const negotiationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     const profileData = {
       name,
       job,
@@ -41,8 +44,12 @@ const Book = () => {
       originalInput: sendInputResult?.originalInput,
       originalMatchData: sendInputResult?.result
     };
-    localStorage.setItem('profileData', JSON.stringify(profileData));
-    router.push('/book/negotiation');
+
+    // Store profile data with unique key for this negotiation
+    localStorage.setItem(`profileData_${negotiationId}`, JSON.stringify(profileData));
+
+    // Navigate to the dynamic route with the unique ID
+    router.push(`/book/negotiation/${negotiationId}`);
   }
   return (
     <div className="min-h-screen relative">
