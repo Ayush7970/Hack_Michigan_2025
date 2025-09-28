@@ -1,20 +1,14 @@
 "use client";
-import React from 'react'
-import MiniNavbar from '@/components/MiniNavbar'
-<<<<<<< HEAD:frontend/app/book/negotiation/[id]/page.tsx
-import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
-=======
-import { useState, useEffect, useRef } from 'react'
->>>>>>> e11d9bb7988c97e24918e4abed2a47cf911a4a8b:frontend/app/book/negotiation/page.tsx
-import { sendNegotiationMessage, getConversation } from '@/lib/negotiationServices'
-import { io, Socket } from 'socket.io-client'
-import axios from 'axios'
-
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'next/navigation';
+import MiniNavbar from '@/components/MiniNavbar';
+import { sendNegotiationMessage, getConversation } from '@/lib/negotiationServices';
+import { io, Socket } from 'socket.io-client';
+import axios from 'axios';
 
 const NegotiationPage = () => {
-  const params = useParams()
-  const negotiationId = params.id as string
+  const params = useParams();
+  const negotiationId = params.id as string;
 
   const [name, setName] = useState("David Bowers");
   const [conversation, setConversation] = useState("Plumber");
@@ -61,7 +55,6 @@ const NegotiationPage = () => {
         currentIndex++;
       } else {
         clearInterval(typingInterval);
-        // Mark as not typing when done
         setMessages(prev => prev.map((msg, index) => 
           index === messageId 
             ? { ...msg, isTyping: false }
@@ -81,36 +74,22 @@ const NegotiationPage = () => {
       setConversation(parsedData.job);
       setOriginalInput(parsedData.originalInput);
 
-      // Set up agent profile for negotiation
       const matchData = parsedData.originalMatchData;
       if (matchData && matchData.matched_uagent) {
         setAgentProfile(matchData.matched_uagent);
       }
 
       console.log("Profile data:", parsedData);
-
-<<<<<<< HEAD:frontend/app/book/negotiation/[id]/page.tsx
-      // Start conversation with original input if available
-      if (parsedData.originalInput && matchData?.matched_uagent) {
-        startNegotiation(parsedData.originalInput, matchData.matched_uagent);
-      }
     } else {
-      // If no profile data, try to load existing conversation
       loadConversation();
-=======
-      // Store the data for later use when WebSocket is ready
-      setOriginalInput(parsedData.originalInput);
-      setAgentProfile(matchData?.matched_uagent);
->>>>>>> e11d9bb7988c97e24918e4abed2a47cf911a4a8b:frontend/app/book/negotiation/page.tsx
     }
   }, [negotiationId]);
 
   // WebSocket connection and event handling
   useEffect(() => {
-    if (conversationId && conversationId !== 'default') {
-      console.log('🔌 Connecting to WebSocket for conversation:', conversationId);
+    if (negotiationId && negotiationId !== 'default') {
+      console.log('🔌 Connecting to WebSocket for conversation:', negotiationId);
       
-      // Create socket connection
       const newSocket = io('http://localhost:8001', {
         transports: ['websocket', 'polling']
       });
@@ -118,40 +97,32 @@ const NegotiationPage = () => {
       socketRef.current = newSocket;
       setSocket(newSocket);
 
-      // Join conversation room
-      newSocket.emit('join_conversation', { conversation_id: conversationId });
+      newSocket.emit('join_conversation', { conversation_id: negotiationId });
 
-          // Handle new messages
-          newSocket.on('new_message', (data) => {
-            console.log('📨 Received new message:', data);
-            console.log('📨 Message role:', data.role);
-            console.log('📨 Message content:', data.content);
-            const newMessage = {
-              role: data.role,
-              content: data.content,
-              timestamp: new Date(),
-              isTyping: true,
-              displayContent: ''
-            };
-            setMessages(prev => {
-              console.log('📨 Adding message to state. Current messages:', prev.length);
-              const updatedMessages = [...prev, newMessage];
-              // Start typing animation for the new message
-              setTimeout(() => {
-                typeMessage(updatedMessages.length - 1, data.content, 20);
-              }, 100);
-              return updatedMessages;
-            });
-          });
+      newSocket.on('new_message', (data) => {
+        console.log('📨 Received new message:', data);
+        const newMessage = {
+          role: data.role,
+          content: data.content,
+          timestamp: new Date(),
+          isTyping: true,
+          displayContent: ''
+        };
+        setMessages(prev => {
+          const updatedMessages = [...prev, newMessage];
+          setTimeout(() => {
+            typeMessage(updatedMessages.length - 1, data.content, 20);
+          }, 100);
+          return updatedMessages;
+        });
+      });
 
-      // Handle negotiation completion
       newSocket.on('negotiation_complete', (data) => {
         console.log('✅ Negotiation completed:', data);
         setNegotiationComplete(true);
         setIsLoading(false);
       });
 
-      // Handle connection events
       newSocket.on('connect', () => {
         console.log('🔌 WebSocket connected');
       });
@@ -162,19 +133,17 @@ const NegotiationPage = () => {
 
       newSocket.on('joined_conversation', (data) => {
         console.log('🏠 Joined conversation room:', data.conversation_id);
-        // Start negotiation after WebSocket is ready
         if (originalInput && agentProfile) {
           console.log('🚀 Starting negotiation after WebSocket setup');
           setTimeout(() => {
-            startNegotiationWithId(originalInput, agentProfile, conversationId);
-          }, 1000); // Small delay to ensure WebSocket is ready
+            startNegotiationWithId(originalInput, agentProfile, negotiationId);
+          }, 1000);
         }
       });
 
-      // Cleanup on unmount
       return () => {
         if (newSocket) {
-          newSocket.emit('leave_conversation', { conversation_id: conversationId });
+          newSocket.emit('leave_conversation', { conversation_id: negotiationId });
           newSocket.disconnect();
         }
         if (liveSocket) {
@@ -183,14 +152,13 @@ const NegotiationPage = () => {
         }
       };
     }
-  }, [conversationId, originalInput, agentProfile]);
+  }, [negotiationId, originalInput, agentProfile]);
 
   const startNegotiationWithId = async (initialMessage: string, profile: any, convId: string) => {
     setIsLoading(true);
     try {
       const response = await sendNegotiationMessage(initialMessage, profile, convId);
       if (response && response.success) {
-        // Load the conversation to get all messages
         loadConversationWithId(convId);
       }
     } catch (error) {
@@ -205,7 +173,6 @@ const NegotiationPage = () => {
     try {
       const response = await sendNegotiationMessage(initialMessage, profile, negotiationId);
       if (response && response.success) {
-        // Load the conversation to get all messages
         loadConversation();
       }
     } catch (error) {
@@ -248,7 +215,6 @@ const NegotiationPage = () => {
         setMessages(formattedMessages);
         setNegotiationComplete(data.is_complete || false);
 
-        // If we have agent profile from conversation, set it
         if (data.agent_profile && !agentProfile) {
           setAgentProfile(data.agent_profile);
           setName(data.agent_profile.name || "Agent");
@@ -260,7 +226,6 @@ const NegotiationPage = () => {
     }
   };
 
-<<<<<<< HEAD:frontend/app/book/negotiation/page.tsx
   // Live conversation functions
   const createLiveConversation = async () => {
     setIsCreatingLiveConversation(true);
@@ -363,53 +328,11 @@ const NegotiationPage = () => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-=======
-<<<<<<< HEAD:frontend/app/book/negotiation/[id]/page.tsx
-  const sendMessage = async () => {
-    if (!currentInput.trim() || !agentProfile || isLoading || negotiationComplete) return;
-
-    const messageToSend = currentInput.trim();
-    setCurrentInput("");
-    setIsLoading(true);
-
-    try {
-      const response = await sendNegotiationMessage(messageToSend, agentProfile, negotiationId);
-
-      if (response && response.success) {
-        // Reload conversation to get updated messages
-        await loadConversation();
-        console.log("✅ Message sent and conversation updated");
-      } else {
-        throw new Error("Failed to send message");
-      }
-    } catch (error) {
-      console.error("💥 Error sending message:", error);
-      const errorMessage = {
-        role: 'system',
-        content: 'Failed to send message. Please try again.',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-=======
->>>>>>> e11d9bb7988c97e24918e4abed2a47cf911a4a8b:frontend/app/book/negotiation/page.tsx
->>>>>>> 028b20da277940ff009e20ae125390f5dfb3f0da:frontend/app/book/negotiation/[id]/page.tsx
   return (
-    <div className="min-h-screen  text-white flex flex-col">
+    <div className="min-h-screen text-white flex flex-col">
       <MiniNavbar/>
 
       {/* Header */}
-<<<<<<< HEAD:frontend/app/book/negotiation/page.tsx
       <div className="p-4 px-16 font-mono border-gray-800">
         <div className="flex justify-between items-start">
           <div>
@@ -426,22 +349,6 @@ const NegotiationPage = () => {
                 AI Agents are negotiating...
               </div>
             )}
-=======
-<<<<<<< HEAD:frontend/app/book/negotiation/[id]/page.tsx
-      <div className="p-4 px-16 font-mono border-gray-800">
-        <h2 className="text-xl font-semibold">Negotiating with {name}</h2>
-        <p className="text-gray-400">{conversation}</p>
-        <p className="text-xs text-gray-500">ID: {negotiationId}</p>
-=======
-      <div className="p-4 px-16 font-mono  border-gray-800">
-        <h2 className="text-xl font-semibold">AI Agent Negotiation</h2>
-        <p className="text-gray-400">Watching {name} negotiate with the service provider</p>
-        <p className="text-gray-500 text-sm">Messages: {messages.length}</p>
->>>>>>> e11d9bb7988c97e24918e4abed2a47cf911a4a8b:frontend/app/book/negotiation/page.tsx
-        {negotiationComplete && (
-          <div className="mt-2 px-3 py-1 bg-green-900 text-green-200 rounded-full text-sm inline-block">
-            Negotiation Complete
->>>>>>> 028b20da277940ff009e20ae125390f5dfb3f0da:frontend/app/book/negotiation/[id]/page.tsx
           </div>
           
           {/* Live Conversation Controls */}
@@ -484,37 +391,37 @@ const NegotiationPage = () => {
         </div>
       </div>
 
-          {/* Messages */}
-          <div className="flex-1 font-inter overflow-y-auto p-4 px-16 space-y-4">
-            {messages.map((message, index) => {
-              console.log('Rendering message:', message);
-              return (
-              <div
-                key={index}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[70%] p-3 rounded-lg ${
-                    message.role === 'user'
-                      ? 'bg-blue-800 text-white border-l-4 border-blue-400'
-                      : message.role === 'system'
-                      ? 'bg-red-900 text-red-200'
-                      : 'bg-gray-800 text-white border-l-4 border-gray-400'
-                  }`}
-                >
-                  <div className="text-xs text-gray-300 mb-1 font-mono">
-                    {message.role === 'user' ? 'Customer AI' : 'Service Provider AI'}
-                  </div>
-                  <p className="whitespace-pre-wrap">
-                    {message.displayContent || message.content}
-                    {message.isTyping && (
-                      <span className="inline-block w-0.5 h-4 bg-current ml-1 animate-pulse"></span>
-                    )}
-                  </p>
-                </div>
+      {/* Messages */}
+      <div className="flex-1 font-inter overflow-y-auto p-4 px-16 space-y-4">
+        {messages.map((message, index) => {
+          console.log('Rendering message:', message);
+          return (
+          <div
+            key={index}
+            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`max-w-[70%] p-3 rounded-lg ${
+                message.role === 'user'
+                  ? 'bg-blue-800 text-white border-l-4 border-blue-400'
+                  : message.role === 'system'
+                  ? 'bg-red-900 text-red-200'
+                  : 'bg-gray-800 text-white border-l-4 border-gray-400'
+              }`}
+            >
+              <div className="text-xs text-gray-300 mb-1 font-mono">
+                {message.role === 'user' ? 'Customer AI' : 'Service Provider AI'}
               </div>
-              );
-            })}
+              <p className="whitespace-pre-wrap">
+                {message.displayContent || message.content}
+                {message.isTyping && (
+                  <span className="inline-block w-0.5 h-4 bg-current ml-1 animate-pulse"></span>
+                )}
+              </p>
+            </div>
+          </div>
+          );
+        })}
 
         {isLoading && (
           <div className="flex justify-start">
@@ -582,10 +489,8 @@ const NegotiationPage = () => {
           </div>
         </div>
       )}
-      
     </div>
-  )
-}
+  );
+};
 
-
-export default NegotiationPage
+export default NegotiationPage;
