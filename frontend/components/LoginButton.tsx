@@ -11,7 +11,15 @@ type LoginButtonProps = {
 
 export default function LoginButton({ className, children }: LoginButtonProps) {
   const { user, isLoading } = useUser();
-  if (isLoading) return null;
+
+  // Show loading state instead of null to prevent flash
+  if (isLoading) {
+    return (
+      <div className={`${className} opacity-75 cursor-not-allowed`}>
+        {children ?? "Login"}
+      </div>
+    );
+  }
 
   // Use defaults if no children provided
   const label = children ?? (user ? "Log Out" : "Log In");

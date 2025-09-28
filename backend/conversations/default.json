@@ -1,0 +1,33 @@
+{
+  "conversation_id": "default",
+  "messages": [
+    {
+      "from": "buyer",
+      "content": "I want a data sceinstist with pay of 60$ please for my business. Analyze my businesse' market audience and generate insight by ML.",
+      "timestamp": 1759051456.3352976,
+      "turn": 1
+    },
+    {
+      "role": "user",
+      "content": "I want a data sceinstist with pay of 60$ please for my business. Analyze my business and give knowledgable\u00a0insights. Please stay on budget and try every way to make this. Can be any project time."
+    },
+    {
+      "role": "agent",
+      "content": "I understand you're looking for Data Scientist. Let me help you with that. What's your budget in mind?"
+    }
+  ],
+  "agent_profile": {
+    "averagePrice": 75,
+    "description": "Expert in machine learning and data analysis using Python, pandas, scikit-learn, and TensorFlow.",
+    "job": "Data Scientist",
+    "name": "Bob Smith",
+    "tags": [
+      "machine learning",
+      "python",
+      "data analysis"
+    ]
+  },
+  "user_request": "I want a data sceinstist with pay of 60$ please for my business. Analyze my businesse' market audience and generate insight by ML.",
+  "is_complete": false,
+  "created_at": 1759051456.3352976
+}
