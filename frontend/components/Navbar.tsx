@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import LoginButton from './LoginButton';
+
 const Navbar = () => {
   return (
     <nav className='w-full border-b-white border-b-1'>
@@ -11,9 +11,7 @@ const Navbar = () => {
             <Link href='/'>About</Link>
             <Link href='/'>Pricing</Link>
         </div>
-        <LoginButton className="font-mono bg-primary p-2 px-9 text-black rounded-3xl">
-          Login
-        </LoginButton> 
+        <Link className='font-mono bg-primary p-2 px-9 text-black rounded-3xl' href='/login'>Login</Link>
       </div>
     </nav>
   )
