@@ -230,6 +230,7 @@ async def on_start(ctx: Context, req: InputMessage) -> BoolResponse:
 @agent.on_rest_get("/conversation", response=ConversationResponse)
 async def get_conversation(ctx: Context) -> ConversationResponse:
     """Get the current conversation history and completion status"""
+    ctx.logger.info(f"Getting conversation history: {conversation_history}")
     is_complete = False
     if len(conversation_history) >= 2:
         # Check if negotiation is complete based on recent messages
