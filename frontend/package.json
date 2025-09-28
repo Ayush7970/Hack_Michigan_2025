@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@auth0/nextjs-auth0": "^3.0.0-beta.3",
+    "auth0": "^5.0.0",
     "axios": "^1.12.2",
     "next": "15.5.4",
     "react": "19.1.0",
