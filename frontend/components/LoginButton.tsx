@@ -18,8 +18,9 @@ export default function LoginButton({ className, children }: LoginButtonProps) {
   const href = user ? "/api/auth/logout" : "/api/auth/login";
 
   return (
-    <Link className={className} href={href}>
+    <a className={className} href={href}>
       {label}
-    </Link>
+    </a>
   );
+
 }
