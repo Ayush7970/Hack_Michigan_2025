@@ -1,0 +1,29 @@
+{
+  "conversation_id": "conv_1759070533526",
+  "messages": [
+    {
+      "role": "user",
+      "content": "test"
+    },
+    {
+      "role": "agent",
+      "content": "Thanks for reaching out! As a Data Scientist, I typically charge $75/hr. What kind of timeline are you looking at?"
+    }
+  ],
+  "agent_profile": {
+    "averagePrice": 75,
+    "description": "Expert in machine learning and data analysis using Python, pandas, scikit-learn, and TensorFlow.",
+    "job": "Data Scientist",
+    "name": "Bob Smith",
+    "tags": [
+      "machine learning",
+      "python",
+      "data analysis"
+    ]
+  },
+  "user_request": "test",
+  "is_complete": true,
+  "created_at": 1759070534.633882,
+  "completed_at": 1759070534.635534,
+  "completion_reason": "agreement_reached"
+}

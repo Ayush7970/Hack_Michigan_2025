@@ -1,0 +1,19 @@
+{
+  "conversation_id": "conv_1759069582440_rv1e7e6ch",
+  "messages": [
+    {
+      "role": "user",
+      "content": "test"
+    },
+    {
+      "role": "agent",
+      "content": "Thanks for reaching out! As a professional, I typically charge $50/hr. What kind of timeline are you looking at?"
+    }
+  ],
+  "agent_profile": {},
+  "user_request": "test",
+  "is_complete": true,
+  "created_at": 1759069583.198268,
+  "completed_at": 1759069583.2009878,
+  "completion_reason": "agreement_reached"
+}
