@@ -1,0 +1,38 @@
+cat > .gitignore << 'EOF'
+# Virtual envs
+.venv/
+venv/
+
+# Python caches & build
+__pycache__/
+*.py[cod]
+*.so
+.dist/
+build/
+dist/
+*.egg-info/
+
+# Tools / IDE
+.vscode/
+.idea/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+
+# OS junk
+.DS_Store
+
+# Secrets & local config
+.env
+.env.*
+*.pem
+*.key
+
+# Node (if any)
+node_modules/
+EOF
+
+env/
+
+backend/env

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Clarissa/Documents/Code/Hackathon/Hack_Michigan_2025/backend/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

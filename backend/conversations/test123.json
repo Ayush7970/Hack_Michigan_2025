@@ -1,0 +1,43 @@
+{
+  "conversation_id": "test123",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello"
+    },
+    {
+      "role": "agent",
+      "content": "Hello there! Thanks for reaching out.\n\nI'm Test, a developer focused on delivering quality services. How can I help you today, or what project are you looking to discuss? I'm happy to chat through your needs."
+    },
+    {
+      "role": "user",
+      "content": "Hi Test, nice to meet you too. I'm looking for some assistance with a small Python scripting task. Could you tell me a bit more about your typical project scope and how you usually structure an engagement for new clients?"
+    },
+    {
+      "role": "agent",
+      "content": "Nice to meet you as well! For small Python scripting tasks like yours, my process is usually quite straightforward. We'd start with a brief discussion to fully understand your specific needs and the script's purpose.\n\nOnce I have a clear picture, I can provide a time estimate. For smaller projects, I often work on an hourly basis, and we can agree on a maximum budget beforehand to ensure predictability. This keeps things efficient and tailored to your requirements."
+    },
+    {
+      "role": "user",
+      "content": "Thanks, Test, that sounds like a sensible approach. What's your standard hourly rate for these scripting tasks? Also, how do you typically handle revisions or minor adjustments once the initial script is delivered and within that agreed maximum budget?"
+    },
+    {
+      "role": "agent",
+      "content": "Thanks for asking! My standard hourly rate for these Python scripting tasks is $50/hour.\n\nRegarding revisions, minor adjustments or bug fixes directly related to the initial scope are typically included within our agreed maximum budget. My aim is to ensure you're completely satisfied with the delivered script. If the scope were to change significantly, we'd simply discuss that upfront.\n\nDoes that sound clear?"
+    },
+    {
+      "role": "user",
+      "content": "Thanks, Test. The revision policy sounds fair. $50/hour is a bit steep for a truly minor script. For a well-defined, small task, would you consider a slightly adjusted rate or perhaps a small fixed-price quote to ensure budget predictability?"
+    }
+  ],
+  "agent_profile": {
+    "name": "Test",
+    "job": "Developer",
+    "averagePrice": 50
+  },
+  "user_request": "Hello",
+  "is_complete": true,
+  "created_at": 1759053329.9335668,
+  "completed_at": 1759053363.000183,
+  "completion_reason": "agreement_reached"
+}
