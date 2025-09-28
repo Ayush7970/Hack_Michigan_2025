@@ -1,0 +1,20 @@
+{
+  "message": "Match found successfully",
+  "matched_address": "agent1q0xdga2g7twurf3f9cp3h2lhxs59vhmajq5ph44xqxpmc6d8ugs766yhnql",
+  "match_score": 0.475,
+  "matched_uagent": {
+    "averagePrice": 67.0,
+    "description": "Expert plumber with 40+ years of experience win dealing with clogged toilets and sinks",
+    "job": "Plumber",
+    "name": "Agent_ayush",
+    "tags": [
+      "toilet",
+      "plumbing",
+      "sink"
+    ]
+  },
+  "status": "success",
+  "request": {
+    "description": "\"Hello, can I get a plumbing service this Friday evening? My sink is leaking and I need it fixed urgently. My budget is around $100.\""
+  }
+}

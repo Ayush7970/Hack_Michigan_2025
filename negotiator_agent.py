@@ -5,11 +5,6 @@ from uagents import Agent, Context, Model
 import pathlib
 import json
 from typing import Optional
-import asyncio # can remve later 
-
-
-START_CONVO = "yes"  # "yes" to initiate on startup
-
 
 
 PROFILE_PATH = "profile_plumber_marcus.json"
@@ -91,93 +86,25 @@ async def call_asi_one(ctx: Context, prompt: str) -> str:
 
 
 async def prompt_cli(ctx: Context):
-    """
-    1) Ask for the opening message
-    2) POST to your matchmaker to get a service uAgent address
-    3) Send the message to that address
-    """
-    MATCHMAKER_URL = "https://literalistic-unadmitted-alton.ngrok-free.dev/match"
-
-    # 1) collect the first message
+    # ask whether to start (only if START_CONVO=yes we ask details)
+    # gather message (& optional skill), then send
     user_text = await asyncio.to_thread(input, "\nType your first message (enter to cancel): ")
     if not user_text.strip():
         ctx.logger.info("[USER] Cancelled, no message entered.")
         return
-
-    # 2) call the matchmaker (expects JSON body with the user_text/description)
-    payload = {"description": user_text}  # server hint: {"user_text": "..."}
-    ctx.logger.info(f"[USER] Contacting matchmaker: {MATCHMAKER_URL}")
-
-    try:
-        async with httpx.AsyncClient(timeout=15) as client:
-            res = await client.post(MATCHMAKER_URL, json=payload)
-        ctx.logger.info(f"[USER] Matchmaker HTTP {res.status_code}")
-        res.raise_for_status()
-    except Exception as e:
-        ctx.logger.error(f"[USER] Matchmaker request failed: {e}")
-        return
-    # write your code here do not chagne other things 
-    
-
-    # 3) parse + store full response; extract the uAgent address separately
-    try:
-        data = res.json()
-    except Exception as e:
-        ctx.logger.error(f"[USER] Could not parse matchmaker JSON: {e}")
-        return
-
-    # Build a clean record and persist it (for debugging / reuse)
-    match_record = {
-        "message": data.get("message"),
-        "matched_address": data.get("matched_address"),
-        "match_score": data.get("match_score"),
-        "matched_uagent": data.get("matched_uagent"),  # dict with name/job/desc/tags/averagePrice
-        "status": data.get("status"),
-        "request": {"description": user_text},
-    }
-    try:
-        with open("last_match.json", "w", encoding="utf-8") as f:
-            json.dump(match_record, f, ensure_ascii=False, indent=2)
-        ctx.logger.info("[USER] Stored match details in last_match.json")
-    except Exception as e:
-        ctx.logger.error(f"[USER] Failed to write last_match.json: {e}")
-
-    # Extract the uAgent address into a separate variable
-    matched_uagent_address = data.get("matched_address")
-
-    if not isinstance(matched_uagent_address, str) or not matched_uagent_address.strip():
-        ctx.logger.error(f"[USER] No valid matched_address in response: {data}")
-        return
-
-    ctx.logger.info(f"[USER] Matched to service: {matched_uagent_address} (score={data.get('match_score')})")
-
-    # 4) send the opening message to the matched service agent
-    try:
-        await ctx.send(matched_uagent_address, Message(message=user_text))
-        ctx.logger.info("[USER] Sent opening message.")
-    except Exception as e:
-        ctx.logger.error(f"[USER] Failed to send message to {matched_uagent_address}: {e}")
-
-
-
-        
+    skill = await asyncio.to_thread(input, "Optional skill (e.g., plumber/carpenter), or press enter: ")
+    # resolve & send
+    target = await resolve_service_address(ctx, user_text)
+    ctx.logger.info(f"[USER] Matched to service: {target}")
+    await ctx.send(target, Message(message=user_text))
 # ---------- events ----------
 @agent.on_event("startup")
 async def on_start(ctx: Context):
     ctx.logger.info(f"Agent live. Address: {agent.address}")
-    if START_CONVO == "yes":
-        # short delay so mailbox is ready
-        await asyncio.sleep(0.3)
-        ctx.logger.info(f"Waiting for the prompt yes or no")
-        await prompt_cli(ctx)
 
 @agent.on_message(model=Message)
 async def on_msg(ctx: Context, sender: str, msg: Message):
     ctx.logger.info(f"Got: {msg.message} (from {sender})")
-
-    # If this machine is the *service*, you just sit and reply.
-    # If this machine is the *user* and you want to start, we ask you for the first message.
-    
 
 
     try:

@@ -4,22 +4,20 @@ from dotenv import load_dotenv
 from uagents import Agent, Context, Model
 import pathlib
 import json
-from typing import Optional
+from typing import Optional, Dict, List, Literal
 import asyncio # can remve later 
 
 
-START_CONVO = "yes"  # "yes" to initiate on startup
+START_CONVO = "yes"
 
+from dotenv import load_dotenv
+load_dotenv()
+x = os.getenv('GEMINI_API_KEY')
+os.environ["GEMINI_API_KEY"] = x
+import google.generativeai as genai
 
-
-PROFILE_PATH = "profile_plumber_marcus.json"
-try:
-    PROFILE_JSON_OBJ = json.loads(pathlib.Path(PROFILE_PATH).read_text(encoding="utf-8"))
-    # Compact string version to include in chat
-    PROFILE_TEXT = json.dumps(PROFILE_JSON_OBJ, ensure_ascii=False)
-except FileNotFoundError:
-    PROFILE_TEXT = "{}"  # fallback if file missing
-
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 # ---------- load env ----------
 load_dotenv()  # make sure .env is in this folder
@@ -37,12 +35,12 @@ class Message(Model):
     message: str
 
 # ---------- agent ----------
-SEED_PHRASE = "My_seed_underscore_phase7970"
+SEED_PHRASE = "seed__111"
 
 agent = Agent(
-    name="agent_Ayush",
+    name="agent_2",
     seed=SEED_PHRASE,
-    port=8000,
+    port=8001,
     mailbox=True,                 # ✅ easiest cross-laptop communication
     readme_path="README.md",
     publish_agent_details=True,
@@ -52,6 +50,8 @@ agent = Agent(
 
 PROMPT_PATH = "negotiator_universal.md"   # <-- your prompt file
 PROMPT_TEXT = pathlib.Path(PROMPT_PATH).read_text(encoding="utf-8")
+
+conversation_history: List[Dict[str, str]] = []
 
 # ---------- asi:one client ----------
 # ---------- asi:one client with debug logs ----------
@@ -66,7 +66,7 @@ async def call_asi_one(ctx: Context, prompt: str) -> str:
         "model": ASI_MODEL.strip(),
         "messages": [
 
-            {"role": "system", "content": f"{PROMPT_TEXT} Counterparty Profile (JSON):\n{PROFILE_TEXT}"},
+            {"role": "system", "content": f"{PROMPT_TEXT}"},
             {"role": "user", "content": prompt},
         ],
         "temperature": 0.2,
@@ -77,7 +77,6 @@ async def call_asi_one(ctx: Context, prompt: str) -> str:
     async with httpx.AsyncClient(timeout=30) as client:
         r = await client.post(url, headers=headers, json=payload)
         ctx.logger.info(f"[ASI DEBUG] HTTP {r.status_code}")
-        ctx.logger.info(f"[ASI DEBUG] Raw body (first 500 chars): {r.text[:500]}")
 
     r.raise_for_status()
     data = r.json()
@@ -87,6 +86,23 @@ async def call_asi_one(ctx: Context, prompt: str) -> str:
 
     return data["choices"][0]["message"]["content"].strip()
 
+def check_negotiation_complete(message: str) -> bool:
+    prompt = '''
+
+    You are a negotiation assistant. Determine if the following message indicates that the negotiation is complete.
+    Message: """{message}"""
+    Important: Only respond with "true" or "false". Do NOT add any extra text.
+    '''
+    response = model.generate_content(prompt)
+
+    mode = "a" if os.path.exists("debug_response.txt") and os.path.getsize("debug_response.txt") > 0 else "w"
+
+    with open("debug_response.txt", mode) as f:
+        f.write(f"Message: {conversation_history[-1]} and {conversation_history[-2]}\nResponse: {response.text}\n\n")
+    if response.text.strip().lower() == "true":
+        return True
+    else:
+        return False
 
 
 
@@ -160,7 +176,6 @@ async def prompt_cli(ctx: Context):
 
 
 
-        
 # ---------- events ----------
 @agent.on_event("startup")
 async def on_start(ctx: Context):
@@ -174,14 +189,16 @@ async def on_start(ctx: Context):
 @agent.on_message(model=Message)
 async def on_msg(ctx: Context, sender: str, msg: Message):
     ctx.logger.info(f"Got: {msg.message} (from {sender})")
-
-    # If this machine is the *service*, you just sit and reply.
-    # If this machine is the *user* and you want to start, we ask you for the first message.
-    
-
+    conversation_history.append({"role": "user", "content": msg.message})
 
     try:
         reply = await call_asi_one(ctx, msg.message)
+        conversation_history.append({"role": "assistant", "content": reply})
+        ctx.logger.info(f"Our response: {reply}")
+        ctx.logger.info(check_negotiation_complete(reply))
+        if check_negotiation_complete(conversation_history):
+            ctx.logger.info("🏁 Negotiation completed! Stopping responses.")
+            return 
     except Exception as e:
         reply = f"Sorry, ASI error: {e}"
         ctx.logger.error(reply)
