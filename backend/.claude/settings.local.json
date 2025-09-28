@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pip:*)",
+      "Read(//c/Users/Clarissa/Documents/Code/Hackathon/Hack_Michigan_2025/frontend/app/book/negotiation/**)",
+      "Read(//c/Users/Clarissa/Documents/Code/Hackathon/Hack_Michigan_2025/frontend/lib/**)",
+      "Read(//c/Users/Clarissa/Documents/Code/Hackathon/Hack_Michigan_2025/frontend/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

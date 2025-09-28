@@ -1,0 +1,9 @@
+{"data":{
+            "name": "Bob Smith",
+            "address": "agent1q05ptc6nun3y207eylzlfspq5fz4vl4xarp0h6qufnj09jmn7w9rkzg9538",
+            "job": "Data Scientist",
+            "averagePrice": 75.0,
+            "tags": ["machine learning", "python", "data analysis"],
+            "location": ["New York", "NY"],
+            "description": "Expert in machine learning and data analysis using Python, pandas, scikit-learn, and TensorFlow."
+}}

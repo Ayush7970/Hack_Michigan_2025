@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import json
 import os
 import uuid
@@ -14,6 +15,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+CORS(app, origins=['http://localhost:3000'])
 
 # Create storage directory if it doesn't exist
 STORAGE_DIR = "json_storage"
@@ -254,7 +256,7 @@ def list_stored_data():
                 "status": "success"
             }), 200
         
-        # Get all JSON files in storage directory
+        # Get all JSON files in storage dir`ectory
         json_files = [f for f in os.listdir(STORAGE_DIR) if f.endswith('.json')]
         ids = [f.replace('.json', '') for f in json_files]
         
@@ -322,6 +324,7 @@ def match_uagent():
                 "status": "error"
             }), 404
         
+        logger.info(uagents)
         # Extract the matched uagent's data
         matched_data = best_match.get('data', {})
         matched_address = matched_data.get('address', '')
