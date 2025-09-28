@@ -18,7 +18,7 @@ form_agent = Agent(
     name="form-agent",
     port=8100,
     seed="form agent",
-    endpoint=["http://localhost:8100/submit"]
+    endpoint=["http://localhost:8100/submit"],
 )
 
 class FormData(Model):
@@ -29,6 +29,7 @@ class FormData(Model):
     location: List[str] = []
     description: str = ""
     message: Optional[str] = None
+    availability: List[str] = []
 
 class InputMessage(Model):
     message: str
@@ -71,13 +72,14 @@ async def handle_form_submission(ctx: Context, req: InputMessage) -> FormData:
             "averagePrice": 0.0,
             "tags": ["string1", "string2"],
             "location": ["remote" or "offline"],
-            "description": "string"
+            "description": "string",
+            "availability": ["monday", "tuesday", "other days...]
         }}
 
         SCENARIOS:
         - If the user wants you to give advice or want you to generate something, respond with good advice and work with user's request. Do NOT return JSON in this case. You can generate and ask for confirmation.
         """
-        
+    
         response = model.generate_content(prompt)
         content = response.text.strip()
         
