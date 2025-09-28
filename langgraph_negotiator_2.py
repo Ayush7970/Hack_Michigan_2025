@@ -92,7 +92,16 @@ async def call_asi_one(ctx: Context, prompt: str, system_prompt: str = None) -> 
     if "choices" not in data:
         raise RuntimeError(f"ASI response missing choices: {data}")
 
-    return data["choices"][0]["message"]["content"].strip()
+    # Clean the response to remove problematic Unicode characters
+    response = data["choices"][0]["message"]["content"].strip()
+
+    # Remove emojis and other problematic Unicode characters
+    import re
+    response = re.sub(r'[^\x00-\x7F]+', '', response)  # Remove non-ASCII characters
+    response = response.replace('\n', ' ').replace('\r', ' ')  # Replace newlines
+    response = ' '.join(response.split())  # Clean up extra spaces
+
+    return response
 
 # LangGraph Nodes
 def process_negotiation_message(state: NegotiationState) -> NegotiationState:
