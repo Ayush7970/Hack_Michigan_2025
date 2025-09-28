@@ -2,10 +2,14 @@
 import React from 'react'
 import MiniNavbar from '@/components/MiniNavbar'
 import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
 import { sendNegotiationMessage, getConversation } from '@/lib/negotiationServices'
 
 
-const Book = () => {
+const NegotiationPage = () => {
+  const params = useParams()
+  const negotiationId = params.id as string
+
   const [name, setName] = useState("David Bowers");
   const [conversation, setConversation] = useState("Plumber");
   const [sendInputResult, setSendInputResult] = useState(null);
@@ -15,11 +19,10 @@ const Book = () => {
   const [currentInput, setCurrentInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [negotiationComplete, setNegotiationComplete] = useState(false);
-  const [conversationId, setConversationId] = useState('default');
   const [agentProfile, setAgentProfile] = useState(null);
 
   useEffect(() => {
-    const profileData = localStorage.getItem('profileData');
+    const profileData = localStorage.getItem(`profileData_${negotiationId}`);
     if (profileData) {
       const parsedData = JSON.parse(profileData);
       setSendInputResult(parsedData.originalMatchData);
@@ -34,20 +37,17 @@ const Book = () => {
         setAgentProfile(matchData.matched_uagent);
       }
 
-      // Create unique conversation ID
-      const newConversationId = `conv_${Date.now()}`;
-      setConversationId(newConversationId);
-
       console.log("Profile data:", parsedData);
-      localStorage.removeItem('profileData');
 
       // Start conversation with original input if available
       if (parsedData.originalInput && matchData?.matched_uagent) {
-        // Use the new conversation ID directly instead of state
-        startNegotiationWithId(parsedData.originalInput, matchData.matched_uagent, newConversationId);
+        startNegotiation(parsedData.originalInput, matchData.matched_uagent);
       }
+    } else {
+      // If no profile data, try to load existing conversation
+      loadConversation();
     }
-  }, []);
+  }, [negotiationId]);
 
   const startNegotiationWithId = async (initialMessage: string, profile: any, convId: string) => {
     setIsLoading(true);
@@ -67,7 +67,7 @@ const Book = () => {
   const startNegotiation = async (initialMessage: string, profile: any) => {
     setIsLoading(true);
     try {
-      const response = await sendNegotiationMessage(initialMessage, profile, conversationId);
+      const response = await sendNegotiationMessage(initialMessage, profile, negotiationId);
       if (response && response.success) {
         // Load the conversation to get all messages
         loadConversation();
@@ -98,7 +98,7 @@ const Book = () => {
 
   const loadConversation = async () => {
     try {
-      const data = await getConversation(conversationId);
+      const data = await getConversation(negotiationId);
       if (data && data.messages) {
         const formattedMessages = data.messages.map((msg) => ({
           role: msg.role === 'agent' ? 'agent' : 'user',
@@ -107,6 +107,13 @@ const Book = () => {
         }));
         setMessages(formattedMessages);
         setNegotiationComplete(data.is_complete || false);
+
+        // If we have agent profile from conversation, set it
+        if (data.agent_profile && !agentProfile) {
+          setAgentProfile(data.agent_profile);
+          setName(data.agent_profile.name || "Agent");
+          setConversation(data.agent_profile.job || "Service Provider");
+        }
       }
     } catch (error) {
       console.error("Error loading conversation:", error);
@@ -121,7 +128,7 @@ const Book = () => {
     setIsLoading(true);
 
     try {
-      const response = await sendNegotiationMessage(messageToSend, agentProfile, conversationId);
+      const response = await sendNegotiationMessage(messageToSend, agentProfile, negotiationId);
 
       if (response && response.success) {
         // Reload conversation to get updated messages
@@ -154,9 +161,10 @@ const Book = () => {
       <MiniNavbar/>
 
       {/* Header */}
-      <div className="p-4 px-16 font-mono  border-gray-800">
+      <div className="p-4 px-16 font-mono border-gray-800">
         <h2 className="text-xl font-semibold">Negotiating with {name}</h2>
         <p className="text-gray-400">{conversation}</p>
+        <p className="text-xs text-gray-500">ID: {negotiationId}</p>
         {negotiationComplete && (
           <div className="mt-2 px-3 py-1 bg-green-900 text-green-200 rounded-full text-sm inline-block">
             Negotiation Complete
@@ -205,4 +213,4 @@ const Book = () => {
 }
 
 
-export default Book
+export default NegotiationPage

@@ -8,7 +8,9 @@
       "Bash(curl -X POST http://localhost:8001/negotiate -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"Hello\"\",\"\"agent_profile\"\":{\"\"name\"\":\"\"Test\"\",\"\"job\"\":\"\"Developer\"\",\"\"averagePrice\"\":50},\"\"conversation_id\"\":\"\"test123\"\"}\")",
       "Bash(taskkill:*)",
       "Bash(curl -X POST http://localhost:8001/negotiate -H \"Content-Type: application/json\" -d \"{\"\"message\"\":\"\"I need a plumber to fix my sink\"\",\"\"agent_profile\"\":{\"\"name\"\":\"\"John Smith\"\",\"\"job\"\":\"\"Plumber\"\",\"\"averagePrice\"\":75},\"\"conversation_id\"\":\"\"test_frontend_123\"\"}\" --max-time 10)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Read(//c/Users/Clarissa/Pictures/Screenshots/**)"
     ],
     "deny": [],
     "ask": []
